@@ -44,15 +44,15 @@ public class Solution {
         conversions.put('x', (char) 0b00101101);
         conversions.put('y', (char) 0b00101111);
         conversions.put('z', (char) 0b00101011);
-
     }
 
     /** Returns the value of a dot in a Braille character by bit shifting.
      * @param   b   a braille character (encoded in 6 digits of a byte)
-     * @param   i   a dot number (from 1 to 6 inclusive)
+     * @param   i   a dot number (from 1 to 6, left to right, inclusive)
      * @return      the value of b's i-th dot
      */
     public static int getDotValue(char b, int i) {
-        return (((b >> i) << 1) < (b >> (i-1))) ? 1 : 0;
+        int r = BRAILLE_LEN + 1 - i;
+        return (((b >> r) << 1) < (b >> (r-1))) ? 1 : 0;
     }
 }
