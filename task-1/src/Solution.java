@@ -12,7 +12,8 @@ public class Solution {
     }
 
     public static String solution(String s) {
-        return s;
+        buildConversions();
+        return findBraille(convertToBrailleInput(s));
     }
 
     /** Stores char-to-braille conversions in a static map. */
@@ -48,20 +49,45 @@ public class Solution {
         conversions.put('z', (char) 0b00101011);
     }
 
-    public static String processCapitals(String str) {
-        StringBuilder strBuilder = new StringBuilder(MAX_PRE_BRAILLE_LEN);
-        strBuilder.append(str.toLowerCase());
+    /** Returns the given string but lowercase, with ! before each capital.
+     * 
+     * @param   s   the string (containing uppercase, lowercase and/or spaces)
+     * @return      s with ! before each original uppercase, now lowercase
+     */
+    public static String convertToBrailleInput(String s) {
+        StringBuilder builder = new StringBuilder(MAX_PRE_BRAILLE_LEN);
+        builder.append(s.toLowerCase());
         int numCaps = 0;
-        for (int i = 0; i < str.length(); i++) {
-            if (Character.isUpperCase(str.charAt(i))) {
-                strBuilder.insert(i + numCaps++, '!');
+        for (int i = 0; i < s.length(); i++) {
+            if (Character.isUpperCase(s.charAt(i))) {
+                builder.insert(i + numCaps++, '!');
             }
         }
-        return strBuilder.toString();
+        return builder.toString();
+    }
+
+    /** Returns the Braille dots corresponding to the given string.
+     * 
+     * @param   s   a string whose characters come from the conversions keyset
+     * @return      the string of 0's and 1's corresponding to each char of s
+     */
+    public static String findBraille(String s) {
+        StringBuilder builder = new StringBuilder(s.length()*BRAILLE_LEN);
+        char b;
+        char braille[] = new char[BRAILLE_LEN];
+        for (char c : s.toCharArray()) {
+            b = conversions.get(c);
+            for (int i = 0; i < BRAILLE_LEN; i++) {
+                braille[i] = (char) ('0' + getDotValue(b, i + 1));
+            }
+            builder.append(braille);
+        }
+        return builder.toString();
     }
 
     /** Returns the value of a dot in a Braille character by bit shifting.
-     * @param   b   a braille character (encoded in 6 digits of a byte)
+     * 
+     * @param   b   a braille character (encoded in the last 6 digits of a byte)
      * @param   i   a dot number (from 1 to 6, left to right, inclusive)
      * @return      the value of b's i-th dot
      */

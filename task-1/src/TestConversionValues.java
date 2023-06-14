@@ -3,7 +3,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
 
-public class TestConversions {
+public class TestConversionValues {
 
     @Before
     public void setup() {
