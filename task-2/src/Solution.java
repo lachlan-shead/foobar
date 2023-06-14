@@ -12,6 +12,18 @@ public class Solution {
 
     public static int[] solution(int h, int[] q) {
         setupSubtreeSizes();
+        for (int i = 0; i < q.length; i++) {
+            SimpleEntry<Integer, Move> treeInfo = findNode(h, q[i]);
+            if (treeInfo.getKey() == h) {
+                q[i] = -1;
+            }
+            else if (treeInfo.getValue() == Move.RIGHT) {
+                q[i] += 1;
+            }
+            else {
+                q[i] += 1 + SUBTREE_SIZE_BY_HEIGHT[treeInfo.getKey()];
+            }
+        }
         return q;
     }
 
@@ -24,9 +36,9 @@ public class Solution {
     }
 
     /** Search the perfect binary tree of a given height for a specific node.
-     * @param   h   the height of the tree being searched
-     * @param   r   the target node, labelled by post-order index
-     * @return      r's level in the tree, and the last move made to reach it
+     * @param   h            the height of the tree being searched
+     * @param   targetNode   the target node, labelled by post-order index
+     * @return               target level in the tree, and the last move made to reach it
      */
     public static SimpleEntry<Integer, Move> findNode(int h, int targetNode) {
         int level = h;
