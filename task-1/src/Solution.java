@@ -7,10 +7,6 @@ public class Solution {
     public static int MAX_PRE_BRAILLE_LEN = 100;
     public static Map<Character, Character> conversions;
 
-    public static void main(String[] args) {
-        System.out.println(solution(args[0]));
-    }
-
     public static String solution(String s) {
         buildConversions();
         return findBraille(convertToBrailleInput(s));
