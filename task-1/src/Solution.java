@@ -1,8 +1,10 @@
 import java.util.Map;
 import java.util.TreeMap;
+import java.lang.StringBuilder;
 
 public class Solution {
     public static int BRAILLE_LEN = 6;
+    public static int MAX_PRE_BRAILLE_LEN = 100;
     public static Map<Character, Character> conversions;
 
     public static void main(String[] args) {
@@ -44,6 +46,18 @@ public class Solution {
         conversions.put('x', (char) 0b00101101);
         conversions.put('y', (char) 0b00101111);
         conversions.put('z', (char) 0b00101011);
+    }
+
+    public static String processCapitals(String str) {
+        StringBuilder strBuilder = new StringBuilder(MAX_PRE_BRAILLE_LEN);
+        strBuilder.append(str.toLowerCase());
+        int numCaps = 0;
+        for (int i = 0; i < str.length(); i++) {
+            if (Character.isUpperCase(str.charAt(i))) {
+                strBuilder.insert(i + numCaps++, '!');
+            }
+        }
+        return strBuilder.toString();
     }
 
     /** Returns the value of a dot in a Braille character by bit shifting.
