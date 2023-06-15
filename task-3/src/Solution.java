@@ -47,4 +47,8 @@ public class Solution {
 
         return -1;
     }
+
+    public static boolean finished(List<Integer> srcN, List<Integer> destN) {
+        return srcN.stream().filter(destN::contains).count() > 0;
+    }
 }
