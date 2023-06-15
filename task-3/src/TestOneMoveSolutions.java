@@ -5,6 +5,12 @@ import org.junit.Test;
 public class TestOneMoveSolutions {
     
     @Test
+    public void trivial() {
+        assertEquals(0, Solution.solution(25, 25),
+            "Trivial case failed");
+    }
+
+    @Test
     public void givenTest1() {
         assertEquals(1, Solution.solution(19,36),
             "Given test 1 (19-36) failed");
