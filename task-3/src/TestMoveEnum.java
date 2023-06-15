@@ -12,7 +12,7 @@ public class TestMoveEnum {
             List<Solution.Move> out = Solution.Move.getLegalMoves(in);
             for (Solution.Move m : exp) {
                 assertTrue(out.contains(m),
-                    Integer.toString(in+m.getDiff()) + " not recognised " +
+                    Integer.toString(in+m.getCoordinateDiff()) + " not recognised " +
                     "for coord " + Integer.toString(in)
                 );
             }
@@ -22,8 +22,8 @@ public class TestMoveEnum {
     
     @Test
     public void testEnumDiffValues() {
-        assertEquals(-17, Solution.Move.ULU.getDiff());
-        assertEquals(10, Solution.Move.DRR.getDiff());
+        assertEquals(-17, Solution.Move.ULU.getCoordinateDiff());
+        assertEquals(10, Solution.Move.DRR.getCoordinateDiff());
     }
 
     @Test
@@ -35,28 +35,32 @@ public class TestMoveEnum {
     }
 
     @Test
-    public void testMovesOnOuterLayers() {
+    public void testMovesOnOutermostLayers() {
         testLambda.accept(4, Arrays.asList(
             Solution.Move.DLL, Solution.Move.DLD,
             Solution.Move.DRD, Solution.Move.DRR));
-        testLambda.accept(12, Arrays.asList(
-            Solution.Move.ULL, Solution.Move.DLL, Solution.Move.DLD,
-            Solution.Move.DRD, Solution.Move.DRR, Solution.Move.URR));
         testLambda.accept(24, Arrays.asList(
             Solution.Move.URU, Solution.Move.URR,
             Solution.Move.DRR, Solution.Move.DRD));
-        testLambda.accept(25, Arrays.asList(
-            Solution.Move.ULU, Solution.Move.URU, Solution.Move.URR,
-            Solution.Move.DRR, Solution.Move.DRD, Solution.Move.DLD));
         testLambda.accept(60, Arrays.asList(
             Solution.Move.ULL, Solution.Move.ULU,
             Solution.Move.URU, Solution.Move.URR));
-        testLambda.accept(52, Arrays.asList(
-            Solution.Move.DLL, Solution.Move.ULL, Solution.Move.ULU,
-            Solution.Move.URU, Solution.Move.URR, Solution.Move.DRR));
         testLambda.accept(31, Arrays.asList(
             Solution.Move.ULU, Solution.Move.ULL,
             Solution.Move.DLL, Solution.Move.DLD));
+    }
+
+    @Test
+    public void testMovesOnSecondmostOuterLayers() {
+        testLambda.accept(12, Arrays.asList(
+            Solution.Move.ULL, Solution.Move.DLL, Solution.Move.DLD,
+            Solution.Move.DRD, Solution.Move.DRR, Solution.Move.URR));
+        testLambda.accept(25, Arrays.asList(
+            Solution.Move.ULU, Solution.Move.URU, Solution.Move.URR,
+            Solution.Move.DRR, Solution.Move.DRD, Solution.Move.DLD));
+        testLambda.accept(52, Arrays.asList(
+            Solution.Move.DLL, Solution.Move.ULL, Solution.Move.ULU,
+            Solution.Move.URU, Solution.Move.URR, Solution.Move.DRR));
         testLambda.accept(30, Arrays.asList(
             Solution.Move.URU, Solution.Move.ULU, Solution.Move.ULL,
             Solution.Move.DLL, Solution.Move.DLD, Solution.Move.DRD));
