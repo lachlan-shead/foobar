@@ -17,7 +17,7 @@ public class TestOneMoveSolutions {
     }
 
     @Test
-    public void testAllOthers() {
+    public void testAllOtherOneMoveSolutionsFrom19() {
         assertEquals(1, Solution.solution(19, 2), "Back2 left failed");
         assertEquals(1, Solution.solution(19, 4), "Back2 right failed");
         assertEquals(1, Solution.solution(19, 9), "Back1 left failed");

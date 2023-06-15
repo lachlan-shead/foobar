@@ -1,23 +1,42 @@
+import java.util.List;
+import java.util.ArrayList;
+
 public class Solution {
+
+    private static int BOARD_LEN = 8;
     
     enum Move {
-        BACK_FAR_LEFT(-17),
-        BACK_FAR_RIGHT(-15),
-        BACK_LEFT(-10),
-        BACK_RIGHT(-6),
-        FORW_LEFT(6),
-        FORW_RIGHT(10),
-        FORW_FAR_LEFT(15),
-        FORW_FAR_RIGHT(17);
+        ULU(-2,-1),
+        URU(-2,+1),
+        ULL(-1,-2),
+        URR(-1,+2),
+        DLL(+1,-2),
+        DRR(+1,+2),
+        DLD(+2,-1),
+        DRD(+2,+1);
 
-        private int diff;
+        private int rowDiff;
+        private int colDiff;
 
-        Move(int diff) {
-            this.diff = diff;
+        Move(int rowDiff, int colDiff) {
+            this.rowDiff = rowDiff;
+            this.colDiff = colDiff;
         }
 
         public int getDiff() {
-            return this.diff;
+            return BOARD_LEN * this.rowDiff + this.colDiff;
+        }
+
+        public static List<Move> getLegalMoves(int coord) {
+            List<Move> legalMoves = new ArrayList<>();
+            legalMoves.addAll(List.of(Move.values()));
+            int row = coord / BOARD_LEN;
+            int col = coord % BOARD_LEN;
+            legalMoves.removeIf(m -> (
+                   (m.rowDiff + row < 0) || (m.rowDiff + row >= BOARD_LEN)
+                || (m.colDiff + col < 0) || (m.colDiff + col >= BOARD_LEN)
+            ));
+            return legalMoves;
         }
     }
 
