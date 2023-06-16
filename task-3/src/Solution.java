@@ -52,18 +52,15 @@ public class Solution {
         List<Integer> srcN = new ArrayList<>(List.of(src));
         List<Integer> destN = new ArrayList<>(List.of(dest));
 
-        int moves = 0;
-        if (oppositeColour(src, dest)) {
-            moves += 1;
-            destN = getUnvisitedNeighbours(destN, destVisited);
-        }
+        /** High-level idea: always check the same colour, expanding outwards */
+        int moves = (oppositeColour(src, dest)) ? 1 : 0;
+        if (moves == 1) destN = getUnvisitedNeighbours(destN, destVisited);
 
         while (!finished(srcN, destN)) {
             moves += 2;
             srcN = getUnvisitedNeighbours(srcN, srcVisited);
             destN = getUnvisitedNeighbours(destN, destVisited);
         }
-
         return moves;
     }
 
@@ -79,9 +76,7 @@ public class Solution {
 
     /** Return the list of all unvisited nodes reachable from the current one. */
     public static List<Integer> getUnvisitedNeighbours(List<Integer> lstN, boolean[] visited) {
-        return lstN.stream()
-            .flatMap(x -> visitNeighbours(x, visited).stream())
-            .collect(toList());
+        return lstN.stream().flatMap(x -> visitNeighbours(x, visited).stream()).collect(toList());
     }
 
     /** Visit and return the list of unvisited nodes from one node. */
