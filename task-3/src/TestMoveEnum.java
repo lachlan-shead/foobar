@@ -22,7 +22,13 @@ public class TestMoveEnum {
     @Test
     public void testEnumDiffValues() {
         assertEquals(-17, Solution.Move.ULU.getCoordinateDiff());
+        assertEquals(-15, Solution.Move.URU.getCoordinateDiff());
+        assertEquals(-10, Solution.Move.ULL.getCoordinateDiff());
+        assertEquals(-6, Solution.Move.URR.getCoordinateDiff());
+        assertEquals(6, Solution.Move.DLL.getCoordinateDiff());
         assertEquals(10, Solution.Move.DRR.getCoordinateDiff());
+        assertEquals(15, Solution.Move.DLD.getCoordinateDiff());
+        assertEquals(17, Solution.Move.DRD.getCoordinateDiff());
     }
 
     @Test

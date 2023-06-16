@@ -1,10 +1,10 @@
 import java.util.List;
 import java.util.ArrayList;
+import static java.util.stream.Collectors.toList;
 
 public class Solution {
 
     public static int BOARD_LEN = 8;
-    public static boolean visited[] = new boolean[BOARD_LEN * BOARD_LEN];
 
     /** Describes the different knight moves by coordinate change. */
     enum Move {
@@ -30,11 +30,7 @@ public class Solution {
             return BOARD_LEN * this.rowDiff + this.colDiff;
         }
 
-        /** Find the moves from a given square that do not leave the board.
-         * 
-         * @param   coord   the current square's index.
-         * @return          the list of legal moves from this square.
-         */
+        /** Find the moves from a given square that do not leave the board. */
         public static List<Move> getLegalMoves(int coord) {
             int row = coord / BOARD_LEN;
             int col = coord % BOARD_LEN;
@@ -49,36 +45,58 @@ public class Solution {
     }
 
     public static int solution(int src, int dest) {
-        visited[src] = true;
-        visited[dest] = true;
-        // List<Integer> srcN = new ArrayList<>(List.of(src));
+        boolean srcVisited[] = new boolean[BOARD_LEN * BOARD_LEN];
+        boolean destVisited[] = new boolean[BOARD_LEN * BOARD_LEN];
+        srcVisited[src] = true;
+        destVisited[dest] = true;
+        List<Integer> srcN = new ArrayList<>(List.of(src));
         List<Integer> destN = new ArrayList<>(List.of(dest));
-        if (src % 2 != dest % 2) {
-            destN = getUnvisitedNeighbours(destN);
+
+        int moves = 0;
+        if (oppositeColour(src, dest)) {
+            moves += 1;
+            destN = getUnvisitedNeighbours(destN, destVisited);
         }
 
-        return -1;
+        while (!finished(srcN, destN)) {
+            moves += 2;
+            srcN = getUnvisitedNeighbours(srcN, srcVisited);
+            destN = getUnvisitedNeighbours(destN, destVisited);
+        }
+
+        return moves;
     }
 
-    public static List<Integer> getUnvisitedNeighbours(List<Integer> lstN) {
-        List<Integer> unvisitedNeighbours = new ArrayList<>();
-        for (int oldSquare : lstN) {
-            for (Move m : Move.getLegalMoves(oldSquare)) {
-                int newSquare = oldSquare + m.getCoordinateDiff();
-                if (visited[newSquare] == true) continue;
-                visited[newSquare] = true;
-                unvisitedNeighbours.add(newSquare);
+    /** Determine whether the src and dest have the same or opposite colour. */
+    public static boolean oppositeColour(int src, int dest) {
+        int srcRow = src / BOARD_LEN;
+        int srcCol = src % BOARD_LEN;
+        int destRow = dest / BOARD_LEN;
+        int destCol = dest % BOARD_LEN;
+        return  ((srcRow % 2 == destRow % 2) && (srcCol % 2 != destCol % 2)) ||
+                ((srcRow % 2 != destRow % 2) && (srcCol % 2 == destCol % 2));
+    }
+
+    /** Return the list of all unvisited nodes reachable from the current one. */
+    public static List<Integer> getUnvisitedNeighbours(List<Integer> lstN, boolean[] visited) {
+        return lstN.stream()
+            .flatMap(x -> visitNeighbours(x, visited).stream())
+            .collect(toList());
+    }
+
+    /** Visit and return the list of unvisited nodes from one node. */
+    public static List<Integer> visitNeighbours(int coord, boolean visited[]) {
+        List<Integer> neighbours = new ArrayList<>();
+        for (Move m : Move.getLegalMoves(coord)) {
+                int neighbour = coord + m.getCoordinateDiff();
+                if (visited[neighbour] == true) continue;
+                visited[neighbour] = true;
+                neighbours.add(neighbour);
             }
-        }
-        return unvisitedNeighbours;
+        return neighbours;
     }
 
-    /** Return whether the search for solutions is finished.
-     * 
-     * @param srcN  the set of neighbours visited from the source.
-     * @param destN the set of neighbours visited from the destination.
-     * @return      whether the two sets have any overlap.
-     */
+    /** Return whether the search for solutions is finished. */
     public static boolean finished(List<Integer> srcN, List<Integer> destN) {
         return srcN.stream().filter(destN::contains).count() > 0;
     }
