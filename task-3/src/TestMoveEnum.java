@@ -1,4 +1,3 @@
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.BiConsumer;
 
@@ -27,47 +26,47 @@ public class TestMoveEnum {
     }
 
     @Test
-    public void testCornerMoves() {
-        testLambda.accept(0, Arrays.asList(Solution.Move.DRR, Solution.Move.DRD));
-        testLambda.accept(7, Arrays.asList(Solution.Move.DLL, Solution.Move.DLD));
-        testLambda.accept(56, Arrays.asList(Solution.Move.URR, Solution.Move.URU));
-        testLambda.accept(63, Arrays.asList(Solution.Move.ULL, Solution.Move.ULU));
+    public void testMovesOnCorners() {
+        testLambda.accept(0, List.of(Solution.Move.DRR, Solution.Move.DRD));
+        testLambda.accept(7, List.of(Solution.Move.DLL, Solution.Move.DLD));
+        testLambda.accept(56, List.of(Solution.Move.URR, Solution.Move.URU));
+        testLambda.accept(63, List.of(Solution.Move.ULL, Solution.Move.ULU));
     }
 
     @Test
     public void testMovesOnOutermostLayers() {
-        testLambda.accept(4, Arrays.asList(
+        testLambda.accept(4, List.of(
             Solution.Move.DLL, Solution.Move.DLD,
             Solution.Move.DRD, Solution.Move.DRR));
-        testLambda.accept(24, Arrays.asList(
+        testLambda.accept(24, List.of(
             Solution.Move.URU, Solution.Move.URR,
             Solution.Move.DRR, Solution.Move.DRD));
-        testLambda.accept(60, Arrays.asList(
+        testLambda.accept(60, List.of(
             Solution.Move.ULL, Solution.Move.ULU,
             Solution.Move.URU, Solution.Move.URR));
-        testLambda.accept(31, Arrays.asList(
+        testLambda.accept(31, List.of(
             Solution.Move.ULU, Solution.Move.ULL,
             Solution.Move.DLL, Solution.Move.DLD));
     }
 
     @Test
     public void testMovesOnSecondmostOuterLayers() {
-        testLambda.accept(12, Arrays.asList(
+        testLambda.accept(12, List.of(
             Solution.Move.ULL, Solution.Move.DLL, Solution.Move.DLD,
             Solution.Move.DRD, Solution.Move.DRR, Solution.Move.URR));
-        testLambda.accept(25, Arrays.asList(
+        testLambda.accept(25, List.of(
             Solution.Move.ULU, Solution.Move.URU, Solution.Move.URR,
             Solution.Move.DRR, Solution.Move.DRD, Solution.Move.DLD));
-        testLambda.accept(52, Arrays.asList(
+        testLambda.accept(52, List.of(
             Solution.Move.DLL, Solution.Move.ULL, Solution.Move.ULU,
             Solution.Move.URU, Solution.Move.URR, Solution.Move.DRR));
-        testLambda.accept(30, Arrays.asList(
+        testLambda.accept(30, List.of(
             Solution.Move.URU, Solution.Move.ULU, Solution.Move.ULL,
             Solution.Move.DLL, Solution.Move.DLD, Solution.Move.DRD));
     }
 
     @Test
     public void testSquareWithAllLegalMoves() {
-        testLambda.accept(19, Arrays.asList(Solution.Move.values()));
+        testLambda.accept(19, List.of(Solution.Move.values()));
     }
 }

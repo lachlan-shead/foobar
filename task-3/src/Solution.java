@@ -3,7 +3,8 @@ import java.util.ArrayList;
 
 public class Solution {
 
-    private static int BOARD_LEN = 8;
+    public static int BOARD_LEN = 8;
+    public static boolean visited[] = new boolean[BOARD_LEN * BOARD_LEN];
 
     /** Describes the different knight moves by coordinate change. */
     enum Move {
@@ -48,11 +49,28 @@ public class Solution {
     }
 
     public static int solution(int src, int dest) {
-        if (src == dest) {
-            return 0;
+        visited[src] = true;
+        visited[dest] = true;
+        // List<Integer> srcN = new ArrayList<>(List.of(src));
+        List<Integer> destN = new ArrayList<>(List.of(dest));
+        if (src % 2 != dest % 2) {
+            destN = getUnvisitedNeighbours(destN);
         }
 
         return -1;
+    }
+
+    public static List<Integer> getUnvisitedNeighbours(List<Integer> lstN) {
+        List<Integer> unvisitedNeighbours = new ArrayList<>();
+        for (int oldSquare : lstN) {
+            for (Move m : Move.getLegalMoves(oldSquare)) {
+                int newSquare = oldSquare + m.getCoordinateDiff();
+                if (visited[newSquare] == true) continue;
+                visited[newSquare] = true;
+                unvisitedNeighbours.add(newSquare);
+            }
+        }
+        return unvisitedNeighbours;
     }
 
     /** Return whether the search for solutions is finished.
