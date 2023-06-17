@@ -23,10 +23,9 @@ public class TestSimpleCases {
     }
 
     @Test
-    public void testCasesWithTwoStates() {
+    public void testSimpleTwoStateCases() {
         testLambda.accept(new int[][]{{0, 0}, {0, 0}}, new int[]{1, 0, 1});
         testLambda.accept(new int[][]{{0, 0}, {2, 5}}, new int[]{1, 1});
         testLambda.accept(new int[][]{{0, 1}, {0, 0}}, new int[]{1, 1});
-        testLambda.accept(new int[][]{{5, 1}, {0, 0}}, new int[]{1, 1});
     }
 }

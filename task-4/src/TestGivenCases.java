@@ -18,7 +18,7 @@ public class TestGivenCases {
     };
 
     @Test
-    public void test1() {
+    public void givenTest1() {
         testLambda.accept(new int[][]{
             {0, 2, 1, 0, 0},
             {0, 0, 0, 3, 4},
@@ -29,7 +29,7 @@ public class TestGivenCases {
     }
 
     @Test
-    public void test2() {
+    public void givenTest2() {
         testLambda.accept(new int[][] {
             {0, 1, 0, 0, 0, 1},
             {4, 0, 0, 3, 2, 0},
@@ -37,6 +37,6 @@ public class TestGivenCases {
             {0, 0, 0, 0, 0, 0},
             {0, 0, 0, 0, 0, 0},
             {0, 0, 0, 0, 0, 0}
-        }, new int[]{0, 3, 2, 9, 14});
+        }, new int[] {0, 3, 2, 9, 14});
     }
 }
