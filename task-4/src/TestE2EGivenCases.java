@@ -5,9 +5,9 @@ import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class TestGivenCases {
+public class TestE2EGivenCases {
 
     static BiConsumer<int[][], int[]> testLambda = (in, exp) -> {
         int[] out = Solution.solution(in);

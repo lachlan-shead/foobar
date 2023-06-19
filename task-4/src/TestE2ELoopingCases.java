@@ -1,13 +1,13 @@
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class TestLoopingCases {
+import org.junit.jupiter.api.Test;
+
+public class TestE2ELoopingCases {
 
     static BiConsumer<int[][], int[]> testLambda = (in, exp) -> {
         int[] out = Solution.solution(in);
