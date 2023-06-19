@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import org.junit.Test;
 
-public class TestSimpleCases {
+public class TestSmallAcyclicCases {
 
     static BiConsumer<int[][], int[]> testLambda = (in, exp) -> {
         int[] out = Solution.solution(in);
@@ -18,14 +18,14 @@ public class TestSimpleCases {
     };
 
     @Test
-    public void testCaseWithOneState() {
+    public void testAcyclicCaseWithOneState() {
         testLambda.accept(new int[][]{{0}}, new int[]{1, 1});
     }
 
     @Test
     public void testSimpleTwoStateCases() {
-        testLambda.accept(new int[][]{{0, 0}, {0, 0}}, new int[]{1, 0, 1});
-        testLambda.accept(new int[][]{{0, 0}, {2, 5}}, new int[]{1, 1});
+        testLambda.accept(new int[][]{{0, 0}, {2, 0}}, new int[]{1, 1});
         testLambda.accept(new int[][]{{0, 1}, {0, 0}}, new int[]{1, 1});
+        testLambda.accept(new int[][]{{0, 0}, {0, 0}}, new int[]{1, 0, 1});
     }
 }
