@@ -2,6 +2,9 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.function.ToIntFunction;
+import java.util.AbstractMap.SimpleEntry;
+
+/** Store fractions using SimpleEntry<a, b> -> a/b. */
 
 public class Solution {
 
@@ -21,6 +24,13 @@ public class Solution {
             denominators.add(s == 0 ? 1 : s);
             terminalStates.add(s == 0);
         }
+    }
+
+    /** Reduces the product of two fractions: (a/b) * (c/d) = (a/d) * (b/c),
+     * where the original fractions were reduced. */
+    public static SimpleEntry<Integer, Integer> fracTimes(SimpleEntry<Integer, Integer> p, SimpleEntry<Integer, Integer> q) {
+            int frac = euclideanGCD(p.getKey(), q.getValue()) * euclideanGCD(q.getKey(), p.getValue());
+            return new SimpleEntry<>((p.getKey() * q.getKey()) / frac, (p.getValue() * q.getValue()) / frac);
     }
 
     /** Finds the GCD of two integers. */
