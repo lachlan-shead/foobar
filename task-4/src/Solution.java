@@ -23,4 +23,14 @@ public class Solution {
         }
     }
 
+    /** Finds the GCD of two integers. */
+    public static int euclideanGCD(int a, int b) {
+        while (b != 0) {
+            int tmp = a;
+            a = b;
+            b = tmp % b;
+        }
+        return a;
+    }
+
 }
