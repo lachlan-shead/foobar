@@ -4,9 +4,7 @@ import java.util.Arrays;
 import java.util.function.ToIntFunction;
 
 public class Solution {
-    private static ToIntFunction<int[]> sum = (r) -> (Arrays.stream(r).sum());
-    public static List<Boolean> terminalStates = new ArrayList<>();
-    public static List<Integer> denominators = new ArrayList<>();
+    public static List<State> states = new ArrayList<>();
 
     static class Fraction {
         private int numer;
@@ -77,13 +75,16 @@ public class Solution {
         private boolean isTerminal;
         private List<Fraction> neighbours;
 
-        State(int ID, int sum, int[][] m) {
+        private static ToIntFunction<int[]> arrSum = (r) -> (Arrays.stream(r).sum());
+
+        State(int ID, int[] mEntries) {
             this.ID = ID;
+            int sum = arrSum.applyAsInt(mEntries);
             this.isTerminal = (sum == 0);
             this.neighbours = new ArrayList<>();
             if (sum == 0) sum = 1;
-            for (int i = 0; i < m.length; i++)
-                neighbours.add(new Fraction(m[ID][i], sum));
+            for (int i = 0; i < mEntries.length; i++)
+                neighbours.add(new Fraction(mEntries[i], sum));
         }
 
         public int getID() {
@@ -146,16 +147,8 @@ public class Solution {
     }
 
     public static int[] solution(int[][] m) {
-        getRowData(m);
+        for (int i = 0; i < m.length; i++)
+            states.add(new State(i, m[i]));
         return null;
-    }
-
-    /** Creates a list denoting which state indices are terminal. */
-    public static void getRowData(final int[][] m) {
-        for (int i = 0; i < m.length; i++) {
-            int s = sum.applyAsInt(m[i]);
-            denominators.add(s == 0 ? 1 : s);
-            terminalStates.add(s == 0);
-        }
     }
 }

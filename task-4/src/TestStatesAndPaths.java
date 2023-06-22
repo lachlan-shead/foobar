@@ -15,7 +15,7 @@ public class TestStatesAndPaths {
             {0, 0, 1},
             {0, 0, 0}
         };
-        Solution.State p0 = new Solution.State(0, 6, m);
+        Solution.State p0 = new Solution.State(0, m[0]);
         Solution.Fraction f0 = new Solution.Fraction(1, 6);
         Solution.Fraction f1 = new Solution.Fraction(5, 6);
         Solution.Fraction f2 = new Solution.Fraction(0, 1);
@@ -37,8 +37,8 @@ public class TestStatesAndPaths {
             {0, 0, 0}
         };
         Solution.Path p1 = new Solution.Path(List.of(
-            new Solution.State(0, 7, m),
-            new Solution.State(1, 12, m)
+            new Solution.State(0, m[0]),
+            new Solution.State(1, m[1])
         ));
         Solution.Fraction f1 = new Solution.Fraction(4, 7);
         assertEquals(2, p1.getNumStates());
@@ -49,7 +49,7 @@ public class TestStatesAndPaths {
         assertEquals(f1.getNumer(), p1.getProbability().getNumer());
         assertEquals(f1.getDenom(), p1.getProbability().getDenom());
         
-        p1.add(new Solution.State(2, 0, m));
+        p1.add(new Solution.State(2, m[2]));
         f1.multiply(new Solution.Fraction(1, 12));
         assertEquals(3, p1.getNumStates());
         assertEquals(0, p1.getStart().getID());
