@@ -33,8 +33,8 @@ public class Solution {
 
         /** Return the GCD between any number of integers. */
         public static int GCD(int... arr) {
-            int gcd = arr[0];
-            for (int i = 1; i < arr.length; i++) gcd = GCD(gcd, arr[i]);
+            int gcd = 0;
+            for (int a : arr) gcd = GCD(gcd, a);
             return gcd;
         }
 
@@ -63,6 +63,86 @@ public class Solution {
                 this.denom * product.getDenom());
             this.simplify();
         }
+
+        /** Finds the GS value for a cycle with given probability a/b.
+         * (No need to check whether |a/b| >= 1 by problem definition.)
+         * Returns 1/(1-(a/b)) = b/(b-a). */
+        public static Fraction findCycleGSValue(final Fraction prob) {
+            return new Fraction(prob.getDenom(), prob.getNumer() - prob.getDenom());
+        }
+    }
+
+    static class State {
+        private int ID;
+        private boolean isTerminal;
+        private List<Fraction> neighbours;
+
+        State(int ID, int sum, int[][] m) {
+            this.ID = ID;
+            this.isTerminal = (sum == 0);
+            this.neighbours = new ArrayList<>();
+            if (sum == 0) sum = 1;
+            for (int i = 0; i < m.length; i++)
+                neighbours.add(new Fraction(m[ID][i], sum));
+        }
+
+        public int getID() {
+            return this.ID;
+        }
+
+        public boolean isTerminal() {
+            return isTerminal;
+        }
+
+        public Fraction getTransitionChance(int nID) {
+            return this.neighbours.get(nID);
+        }
+    }
+
+    static class Path {
+        private List<State> states;
+        private int numStates;
+        private Fraction probability;
+        private State end;
+
+        public Path(final List<State> states) {
+            this.states = new ArrayList<>();
+            this.numStates = 0;
+            this.probability = new Fraction(1, 1);
+            for (State s : states) this.add(s);
+        }
+
+        public void add(final State s) {
+            if (numStates > 0)
+                this.probability.multiply(this.end.getTransitionChance(s.getID()));
+            this.states.add(s);
+            this.end = s;
+            this.numStates++;
+        }
+
+        public List<State> getStates() {
+            return this.states;
+        }
+
+        public State getStart() {
+            return this.states.get(0);
+        }
+
+        public State getEnd() {
+            return this.end;
+        }
+
+        public int getNumStates() {
+            return this.numStates;
+        }
+
+        public Fraction getProbability() {
+            return this.probability;
+        }
+
+        public boolean isCyclic() {
+            return (this.numStates > 0) && (this.getStart() == this.getEnd());
+        }
     }
 
     public static int[] solution(int[][] m) {
@@ -78,12 +158,4 @@ public class Solution {
             terminalStates.add(s == 0);
         }
     }
-
-    /** Finds the geometric series value of a cycle with probability given by a fraction.
-     *  
-    */
-    public static Fraction findCycleGSValue(Fraction prob) {
-        return new Fraction(prob.getDenom(), prob.getNumer() - prob.getDenom());
-    }
-
 }
