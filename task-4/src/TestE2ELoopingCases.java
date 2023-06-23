@@ -27,29 +27,35 @@ public class TestE2ELoopingCases {
         }, new int[] {1, 1});
 
         testLambda.accept(new int[][] {
-            {0, 1, 1},
-            {1, 0, 0},
-            {0, 0, 0}
+            {0, 1, 0, 0},
+            {1, 0, 0, 1},
+            {0, 0, 1, 0},
+            {0, 0, 0, 0}
         }, new int[] {1, 1});
-    }
 
-    @Test
-    public void testSelfLoops() {
-        testLambda.accept(new int[][] {
-            {1, 4, 1},
-            {1, 0, 0},
-            {0, 0, 0}
-        }, new int[] {1, 1});
-    }
-
-    @Test
-    public void testOneLoopTwoTerminalStates() {
         testLambda.accept(new int[][] {
             {0, 2, 0, 1},
             {1, 0, 2, 1},
             {0, 0, 0, 0},
             {0, 0, 0, 0}
         }, new int[] {2, 3, 5});
+    }
+
+    @Test
+    public void testMultipleAndSelfLoops() {
+        testLambda.accept(new int[][] {
+            {1, 4, 1},
+            {1, 0, 0},
+            {0, 0, 0}
+        }, new int[] {1, 1});
+
+        testLambda.accept(new int[][] {
+            {0, 1, 0, 1, 0},
+            {0, 1, 1, 1, 0},
+            {0, 0, 0, 0, 0},
+            {0, 0, 0, 1, 3},
+            {0, 0, 0, 0, 0}
+        }, new int[] {1, 3, 4});
     }
 
 }

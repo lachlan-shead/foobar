@@ -1,10 +1,13 @@
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.function.ToIntFunction;
 
 public class Solution {
-    public static List<State> states = new ArrayList<>();
+    private static Map<Integer, State> terminalStates = new HashMap<>();
+    private static Map<Integer, State> nonTerminalStates = new HashMap<>();
 
     static class Fraction {
         private int numer;
@@ -17,6 +20,7 @@ public class Solution {
             this.simplify();
         }
 
+        /** Make this instance irreducible. */
         public void simplify() {
             int gcd = GCD(this.numer, this.denom);
             this.numer /= gcd;
@@ -27,13 +31,6 @@ public class Solution {
         public static int GCD(int a, int b) {
             if (b == 0) return a;
             return GCD(b, a % b);
-        }
-
-        /** Return the GCD between any number of integers. */
-        public static int GCD(int... arr) {
-            int gcd = 0;
-            for (int a : arr) gcd = GCD(gcd, a);
-            return gcd;
         }
 
         public void set(int numer, int denom) {
@@ -65,26 +62,29 @@ public class Solution {
         /** Finds the GS value for a cycle with given probability a/b.
          * (No need to check whether |a/b| >= 1 by problem definition.)
          * Returns 1/(1-(a/b)) = b/(b-a). */
-        public static Fraction findCycleGSValue(final Fraction prob) {
-            return new Fraction(prob.getDenom(), prob.getNumer() - prob.getDenom());
+        public static Fraction findCycleGSValue(final List<Fraction> cycleProbs) {
+            Fraction f = new Fraction(0, 1);
+            for (Fraction c : cycleProbs) f.add(c);
+            f.set(f.getDenom(), f.getDenom() - f.getNumer());
+            return f;
         }
     }
 
     static class State {
         private int ID;
         private boolean isTerminal;
-        private List<Fraction> neighbours;
+        private Map<Integer, Fraction> neighbours;
 
         private static ToIntFunction<int[]> arrSum = (r) -> (Arrays.stream(r).sum());
 
         State(int ID, int[] mEntries) {
             this.ID = ID;
+            this.neighbours = new HashMap<>();
             int sum = arrSum.applyAsInt(mEntries);
             this.isTerminal = (sum == 0);
-            this.neighbours = new ArrayList<>();
             if (sum == 0) sum = 1;
             for (int i = 0; i < mEntries.length; i++)
-                neighbours.add(new Fraction(mEntries[i], sum));
+                if (mEntries[i] > 0) neighbours.put(i, new Fraction(mEntries[i], sum));
         }
 
         public int getID() {
@@ -92,9 +92,10 @@ public class Solution {
         }
 
         public boolean isTerminal() {
-            return isTerminal;
+            return this.isTerminal;
         }
 
+        /** Gets the chance of going from current state to another. */
         public Fraction getTransitionChance(int nID) {
             return this.neighbours.get(nID);
         }
@@ -113,6 +114,7 @@ public class Solution {
             for (State s : states) this.add(s);
         }
 
+        /** Add one more edge to the path. */
         public void add(final State s) {
             if (numStates > 0)
                 this.probability.multiply(this.end.getTransitionChance(s.getID()));
@@ -141,14 +143,21 @@ public class Solution {
             return this.probability;
         }
 
+        /** Decide whether the path is a cycle. */
         public boolean isCyclic() {
             return (this.numStates > 0) && (this.getStart() == this.getEnd());
         }
     }
 
     public static int[] solution(int[][] m) {
-        for (int i = 0; i < m.length; i++)
-            states.add(new State(i, m[i]));
+        /** Encode m as a list of states with fractional neighbour weightings */
+        for (int i = 0; i < m.length; i++) {
+            State s = new State(i, m[i]);
+            (s.isTerminal ? terminalStates : nonTerminalStates).put(i, s);
+        }
+
+        /** Find all paths to each node */
+
         return null;
     }
 }

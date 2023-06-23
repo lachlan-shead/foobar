@@ -1,3 +1,5 @@
+import java.util.List;
+import java.util.ArrayList;
 import java.util.function.BiConsumer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -12,6 +14,11 @@ public class TestFractions {
         f1.multiply(f2);
         assertEquals(expectedNumer, f1.getNumer(), "numerators mismatch");
         assertEquals(expectedDenom, f1.getDenom(), "denominators mismatch");
+    };
+
+    static BiConsumer<Solution.Fraction, Solution.Fraction> testComp = (exp, out) -> {
+        assertEquals(exp.getNumer(), out.getNumer(), "numerators mismatch");
+        assertEquals(exp.getDenom(), out.getDenom(), "denominators mismatch");
     };
 
     @Test
@@ -48,10 +55,6 @@ public class TestFractions {
         assertEquals(20, Solution.Fraction.GCD(20, 340));
         assertEquals(1, Solution.Fraction.GCD(340, 7));
         assertEquals(20, Solution.Fraction.GCD(20, 0));
-
-        assertEquals(1, Solution.Fraction.GCD(1, 102, 204));
-        assertEquals(102, Solution.Fraction.GCD(0, 102, 204));
-        assertEquals(1, Solution.Fraction.GCD(15, 20, 24));
     }
 
     @Test
@@ -94,5 +97,14 @@ public class TestFractions {
         f1.add(f2);
         assertEquals(1, f1.getNumer());
         assertEquals(1, f1.getDenom());
+    }
+
+    @Test
+    public void testCycleGSProbs() {
+        List<Solution.Fraction> fs = new ArrayList<>();
+        fs.add(new Solution.Fraction(2, 3));
+        testComp.accept(new Solution.Fraction(3, 1), Solution.Fraction.findCycleGSValue(fs));
+        fs.add(new Solution.Fraction(1, 5));
+        testComp.accept(new Solution.Fraction(15, 2), Solution.Fraction.findCycleGSValue(fs));
     }
 }
