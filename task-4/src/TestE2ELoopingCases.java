@@ -17,7 +17,6 @@ public class TestE2ELoopingCases {
             "Real and expected mismatch");
     };
 
-
     @Test
     public void testOneLoopOneTerminalState() {
         testLambda.accept(new int[][] {
@@ -26,13 +25,20 @@ public class TestE2ELoopingCases {
             {0, 0, 0}
         }, new int[] {1, 1});
 
+    }
+
+    @Test
+    public void test2() {
         testLambda.accept(new int[][] {
             {0, 1, 0, 0},
             {1, 0, 0, 1},
             {0, 0, 1, 0},
             {0, 0, 0, 0}
         }, new int[] {1, 1});
+    }
 
+    @Test
+    public void test3() {
         testLambda.accept(new int[][] {
             {0, 2, 0, 1},
             {1, 0, 2, 1},
@@ -48,7 +54,10 @@ public class TestE2ELoopingCases {
             {1, 0, 0},
             {0, 0, 0}
         }, new int[] {1, 1});
+    }
 
+    @Test
+    public void test4() {
         testLambda.accept(new int[][] {
             {0, 1, 0, 1, 0},
             {0, 1, 1, 1, 0},

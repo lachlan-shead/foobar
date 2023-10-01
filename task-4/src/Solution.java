@@ -3,7 +3,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.HashMap;
-import java.util.function.ToIntFunction;
+import java.util.Set;
+import java.util.Deque;
+import java.util.ArrayDeque;
+import java.util.stream.Collectors;
 
 public class Solution {
     private static Map<Integer, State> terminalStates = new HashMap<>();
@@ -33,7 +36,11 @@ public class Solution {
             return GCD(b, a % b);
         }
 
-        public void set(int numer, int denom) {
+        public boolean equals(final Fraction f) {
+            return (f.numer == this.numer) && (f.denom == this.denom);
+        }
+
+        public void set(final int numer, final int denom) {
             this.numer = numer;
             this.denom = denom;
         }
@@ -47,56 +54,77 @@ public class Solution {
         }
 
         /** Multiply the current fraction by another (leaves input unchanged). */
-        public void multiply(final Fraction product) {
+        public Fraction multiply(final Fraction product) {
             this.set(this.numer * product.getNumer(), this.denom * product.getDenom());
             this.simplify();
+            return this;
         }
 
         /** Add the current fraction by another (leaves input unchanged). */
-        public void add(final Fraction product) {
+        public Fraction add(final Fraction product) {
             this.set(this.numer * product.getDenom() + this.denom * product.getNumer(),
                 this.denom * product.getDenom());
             this.simplify();
+            return this;
         }
 
         /** Finds the GS value for a cycle with given probability a/b.
          * (No need to check whether |a/b| >= 1 by problem definition.)
          * Returns 1/(1-(a/b)) = b/(b-a). */
-        public static Fraction findCycleGSValue(final List<Fraction> cycleProbs) {
-            Fraction f = new Fraction(0, 1);
-            for (Fraction c : cycleProbs) f.add(c);
-            f.set(f.getDenom(), f.getDenom() - f.getNumer());
-            return f;
+        public Fraction findCycleGSValue() {
+            this.set(this.getDenom(), this.getDenom() - this.getNumer());
+            return this;
+        }
+
+        /** Finds an int array with a common denominator for any number of fractions. */
+        public static int[] consolidate(final List<Fraction> probabilities) {
+            int denomLCM = 1;
+            for (Fraction f : probabilities)
+                denomLCM *= f.denom / GCD(denomLCM, f.denom);
+
+            List<Integer> consolidated = new ArrayList<>();
+            for (Fraction f : probabilities)
+                consolidated.add(f.numer * denomLCM / f.denom);
+            consolidated.add(denomLCM);
+            return consolidated.stream().mapToInt(i -> i).toArray();
         }
     }
 
     static class State {
         private int ID;
-        private boolean isTerminal;
         private Map<Integer, Fraction> neighbours;
+        private Fraction visitProbability;
 
-        private static ToIntFunction<int[]> arrSum = (r) -> (Arrays.stream(r).sum());
-
-        State(int ID, int[] mEntries) {
+        State(int ID, int[] outbound) {
             this.ID = ID;
             this.neighbours = new HashMap<>();
-            int sum = arrSum.applyAsInt(mEntries);
-            this.isTerminal = (sum == 0);
-            if (sum == 0) sum = 1;
-            for (int i = 0; i < mEntries.length; i++)
-                if (mEntries[i] > 0) neighbours.put(i, new Fraction(mEntries[i], sum));
+            this.visitProbability = new Fraction(ID == 0 ? 1 : 0, 1);
+            int sum = Arrays.stream(outbound).sum();
+            if (sum == 0) return;
+            for (int i = 0; i < outbound.length; i++) {
+                if (outbound[i] > 0)
+                    neighbours.put(i, new Fraction(outbound[i], sum));
+            }
         }
 
         public int getID() {
             return this.ID;
         }
 
-        public boolean isTerminal() {
-            return this.isTerminal;
+        public Set<Integer> getNeighbours() {
+            return this.neighbours.keySet();
+        }
+
+        public Fraction getVisitProbability() {
+            return this.visitProbability;
+        }
+
+        public void addToVisitProb(final Fraction f) {
+            this.visitProbability.add(f);
         }
 
         /** Gets the chance of going from current state to another. */
-        public Fraction getTransitionChance(int nID) {
+        public Fraction getTransitionChance(final int nID) {
             return this.neighbours.get(nID);
         }
     }
@@ -107,28 +135,32 @@ public class Solution {
         private Fraction probability;
         private State end;
 
-        public Path(final List<State> states) {
-            this.states = new ArrayList<>();
-            this.numStates = 0;
+        private static List<Path> cycles = new ArrayList<>();
+
+        public Path(final State s) {
+            this.states = new ArrayList<>(List.of(s));
+            this.numStates = 1;
             this.probability = new Fraction(1, 1);
-            for (State s : states) this.add(s);
+            this.end = s;
         }
 
-        /** Add one more edge to the path. */
+        public Path(final List<State> states) {
+            this(states.get(0));
+            for (State s : states.subList(1, states.size()))
+                this.add(s);
+        }
+
+        /** Add one more state to the path, disallowing finishing cycles. */
         public void add(final State s) {
-            if (numStates > 0)
-                this.probability.multiply(this.end.getTransitionChance(s.getID()));
             this.states.add(s);
-            this.end = s;
             this.numStates++;
+            this.probability.multiply(this.end.getTransitionChance(s.getID()));
+            s.addToVisitProb(this.probability);
+            this.end = s;
         }
 
         public List<State> getStates() {
             return this.states;
-        }
-
-        public State getStart() {
-            return this.states.get(0);
         }
 
         public State getEnd() {
@@ -143,21 +175,134 @@ public class Solution {
             return this.probability;
         }
 
-        /** Decide whether the path is a cycle. */
-        public boolean isCyclic() {
-            return (this.numStates > 0) && (this.getStart() == this.getEnd());
+        public void branch(final Map<Integer, State> nonTerminalStates, Deque<Path> toExpand) {
+            for (int i : this.end.getNeighbours()) {
+                State s = nonTerminalStates.get(i);
+                if (s == null) continue;
+                if (this.states.contains(s)) {
+                    Path p = this.copyFromState(s);
+                    p.probability.multiply(this.end.getTransitionChance(s.getID()));
+                    for (Path c : Path.cycles)
+                        if (p.equals(c)) continue;
+                    Path.cycles.add(p);
+                }
+                else {
+                    Path p = this.deepCopy();
+                    p.add(s);
+                    toExpand.add(p);
+                }
+            }
+        }
+
+        public boolean equals(final Path p) {
+            if (p.numStates != this.numStates) return false;
+            for (int i = 0; i < p.numStates; i++) {
+                if (p.states.get(i).getID() != this.states.get(i).getID()) return false;
+            }
+            return true;
+        }
+
+        public Path deepCopy() {
+            Path p = new Path(this.states);
+            p.probability = new Fraction(this.probability.getNumer(), this.probability.getDenom());
+            return p;
+        }
+
+        public Path copyFromState(State s) {
+            Path p = new Path(s);
+            p.end = s;
+            for (State t : this.states.subList(this.states.indexOf(s) + 1, this.numStates)) {
+                p.probability.multiply(p.end.getTransitionChance(t.getID()));
+                p.states.add(t);
+                p.end = t;
+                p.numStates++;
+            }
+            return p;
+        }
+
+        public static List<Path> getCycles() {
+            return Path.cycles;
+        }
+
+        public static void mergeCycles() {
+            for (int i = 0; i + 1 < Path.cycles.size(); i++) {
+                Path p = Path.cycles.get(i);
+                for (Path t : Path.cycles.subList(i + 1, Path.cycles.size())) {
+                    List<State> nonOverlap = t.states.stream()
+                        .filter(s -> !p.states.contains(s))
+                        .collect(Collectors.toList());
+                    if (nonOverlap.size() == t.states.size()) continue;
+                    Path.cycles.remove(t);
+                    p.states.addAll(nonOverlap);
+                    p.probability.add(t.probability);
+                }
+            }
+        }
+
+        public static void findTrueProbabilities() {
+            for (Path p : Path.cycles) {
+                p.probability.findCycleGSValue();
+                for (State s : p.getStates())
+                    s.getVisitProbability().multiply(p.probability);
+            }
         }
     }
 
     public static int[] solution(int[][] m) {
         /** Encode m as a list of states with fractional neighbour weightings */
         for (int i = 0; i < m.length; i++) {
-            State s = new State(i, m[i]);
-            (s.isTerminal ? terminalStates : nonTerminalStates).put(i, s);
+            (Arrays.stream(m[i]).sum() == 0 ? terminalStates : nonTerminalStates)
+                .put(i, new State(i, m[i]));
+        }
+        if (terminalStates.containsKey(0)) {
+            List<Integer> terminalProbabilities = new ArrayList<>();
+            terminalProbabilities.add(1);
+            for (int i = 1; i < terminalStates.size(); i++) terminalProbabilities.add(0);
+            terminalProbabilities.add(1);
+            return terminalProbabilities.stream().mapToInt(i -> i).toArray();
         }
 
-        /** Find all paths to each node */
+        /** Branch out from s0 in every way possible; store paths incoming
+         * to each state by instance and cycles statically in Path. */
+        Deque<Path> toExpand = new ArrayDeque<>();
+        toExpand.add(new Path(nonTerminalStates.get(0)));
+        while (!toExpand.isEmpty())
+            toExpand.pop().branch(nonTerminalStates, toExpand);
 
-        return null;
+        /** Deal with cycles... */
+        Path.mergeCycles();
+        Path.findTrueProbabilities();
+
+        /** Find the weighted probability of reaching each terminal state,
+         * then return them in requested format. */
+        List<Fraction> terminalProbabilities = getTerminalProbabilities();
+        return Fraction.consolidate(terminalProbabilities);
+    }
+
+    public static List<Fraction> getTerminalProbabilities() {
+        List<Fraction> terminalProbabilities = new ArrayList<>();
+        List<Integer> sortedTerminalStates = terminalStates.keySet().stream()
+            .sorted().collect(Collectors.toList());
+        for (int j : sortedTerminalStates) {
+            State t = terminalStates.get(j);
+            for (int i : nonTerminalStates.keySet()) {
+                State s = nonTerminalStates.get(i);
+                if (!s.getNeighbours().contains(j)) continue;
+                t.getVisitProbability().add(
+                    s.getTransitionChance(j).multiply(s.getVisitProbability()));
+            }
+            terminalProbabilities.add(t.getVisitProbability());
+        }
+        return terminalProbabilities;
+    }
+
+    public static void main(String[] a) {
+        Solution.solution(new int[][] {
+            {0, 1, 0, 1, 0},
+            {0, 1, 1, 1, 0},
+            {0, 0, 0, 0, 0},
+            {0, 0, 0, 1, 3},
+            {0, 0, 0, 0, 0}
+        });
     }
 }

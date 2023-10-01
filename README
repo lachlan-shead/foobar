@@ -1,0 +1,59 @@
+# foobar
+
+My attempts at the first few foobar challenges! I was sent this challenge after a history of making extensive searches, which showed Google that I was passionate about software development.
+
+I implemented all solutions in Java, without any internet searching besides Java documentation.
+
+# 1: Braille
+
+### The challenge
+
+Given an ASCII string, this challenge asks for the same string encoded in Braille.
+
+### Solution notes
+
+I wanted to make my solution space-efficient, so I encoded each Braille character in a single byte. These were then indexed by a character-to-character map; bit-shifting was used to determine the value of each digit.
+
+# 2: Perfect tree search
+
+### The challenge
+
+Given the height `h` of a perfect tree and a target node index (where nodes are labeled by post-order DFS), the challenge is to find the node's level in the tree and whether its parent is to the left or right.
+
+### Solution notes
+
+I began by spending some time analysing the problem. It turns out that the combination of perfect binary tree with post-order indexing gives several nice properties. In particular,
+- Each subtree of height `l` has size `s(l)=s(l-1)/2-1`, with a base case of `s(h)=2^h-1`. It is important that the size is the same no matter where you enter the level, since this makes it easier to iterate down the tree.
+- *Every* index in the left subtree of *every* node is strictly smaller than those in the corresponding right subtree! This makes it possible to perform the serach down a single branch of the tree (in `O(log h)` time), starting from the root, based on the subtree sizes and the current index at each step.
+
+I wanted an efficient solution, so I pre-computed the size of a perfect tree of size `0` and all permissible heights (`1-30` inclusive). Then I used these to perform the search in `O(1)` time at each iteration!
+
+# 3: Knight jumps
+
+### The challenge
+
+Given two integer coordinates of a chessboard (indexed left-to-right, top-to-bottom), find the minimum number of moves a knight needs to make to go between them.
+
+### Solution notes
+
+I wanted as efficient a solution as I could find, while still performing a search (rather than a purely formulaic solution). I began by noting several properties about the problem, each of which directly shaped the solution:
+- The search can begin from either the start or end square. Indeed, it is more performant to conduct two searches with `n` iterations than one search with `2n` iterations, since the time taken is worse than linear. So my solution performs a search from start and end squares at the same time.
+- At each step of the search, each square reached on the previous move needs to be replaced by each of its neighbours that has not been visited before. This suggests an expanding concept of frontiers. The return value is also incremented by 2 at each case (one move for start and one for end frontiers).
+- The search will finish if the start and end frontiers ever overlap. If this overlap occurs after `n` iterations, `2n` is guaranteed to be the most efficient solution, since every frontier square is compared.
+- The fact that only even solutions can be returned sets off some alarm bells! Indeed, if the start and end square are different colours, so will the frontiers be at every step. To guarantee that overlap occurs here, one of start or end (chosen WLOG) starts with an extra step, and the return value starts at 1.
+
+This all shaped my answer to be as efficient as possible!
+
+# 4: Stable transition matrix outcomes
+
+This is where my foobar experience ended. This challenge is at a harder difficulty level than the previous ones, and some external factors meant I had less time to work on the problem. Despite not finishing, though, I learned a lot from the experience!
+
+Given an `n` by `n` probabilistic transition matrix, and always starting at state `0`, the challenge is to return an `n`-element array whose `i`-th index indicates the *true* probability of ending at state `i`. The transition matrix is permitted to contain loops of any length.
+
+### Solution notes
+
+(First, a disclaimer: it is egregiously unreadable to include the Fraction class within the Solution one. However, I was only allowed a single Java file for submission.)
+
+Several mathematical properties influenced my attempt. I was aware from the beginning that my solution would need to account for loops from the beginning, so I invested a lot of time in understanding how the true value changes based on their inclusion (including a variety of relationships between them). I ended up modeling the problem as a set of states with paths between them. Each path had a fractional probability associated with it, and when a path cycled that probability was simply put into the limit of a geometric series: from `a/b` to `1/(1-a/b)=b/(b-a)`.
+
+I ended up solving most of my own test cases, but not many of Google's private tests; this is likely because of timeout restrictions they imposed on Java solutions. Nevertheless, it was a great challenge to be part of!
